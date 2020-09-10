@@ -20,7 +20,6 @@ from distutils.version import LooseVersion
 import inspect
 import itertools
 import os
-import pytest
 import unittest
 import warnings
 
