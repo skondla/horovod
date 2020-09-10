@@ -250,8 +250,8 @@ steps:
   agents:
     queue: cpu
 - wait
-- label: ':pytest: Run PyTests (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c " cd /horovod/test && (ls -1 test_*.py | sed 's/[a-z_]*tensorflow2[a-z_.]*//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
+- label: ':pytest: MPI Parallel PyTests (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+  command: bash -c " cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -266,8 +266,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests Standalone (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c " cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.standalone.xml test_spark.py test_run.py"
+- label: ':pytest: MPI Single PyTests (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -282,8 +282,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run Cluster PyTests (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
+- label: ':pytest: MPI Cluster PyTests (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -299,7 +299,7 @@ steps:
   agents:
     queue: cpu
 - label: ':jupyter: Run PyTests test_interactiverun (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml test_interactiverun.py"
+  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml integration/test_interactiverun.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -314,7 +314,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow MNIST (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+- label: ':tensorflow: MPI TensorFlow MNIST (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/tensorflow_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -330,7 +330,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow Eager MNIST (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+- label: ':tensorflow: MPI TensorFlow Eager MNIST (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/tensorflow_mnist_eager.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -346,7 +346,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test Keras MNIST (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+- label: ':tensorflow: MPI Keras MNIST (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/keras_mnist_advanced.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -362,7 +362,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':fire: Test PyTorch MNIST (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+- label: ':fire: MPI PyTorch MNIST (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/pytorch_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -378,7 +378,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test MXNet MNIST (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+- label: ':muscle: MPI MXNet MNIST (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
   command: bash -c " OMP_NUM_THREADS=1 \$(cat /mpirun_command) python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -394,7 +394,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test Stall (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+- label: ':muscle: MPI Stall (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/test/test_stall.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -410,7 +410,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':terminal: Test Horovodrun (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+- label: ':terminal: MPI Horovodrun (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
   command: horovodrun -np 2 -H localhost:2 python /horovod/examples/tensorflow_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -426,7 +426,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':terminal: Test Horovodrun (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+- label: ':terminal: MPI Horovodrun (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
   command: bash -c "echo 'localhost slots=2' > hostfile && horovodrun -np 2 -hostfile hostfile python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -491,7 +491,7 @@ steps:
   agents:
     queue: cpu
 - label: ':spark: PyTests Spark Estimators (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c "cd /horovod/test && pytest --forked -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.spark.integration.xml test_spark_keras.py test_spark_torch.py"
+  command: bash -c "cd /horovod/test && pytest --forked -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.spark.integration.xml integration/test_spark_keras.py integration/test_spark_torch.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -570,8 +570,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c "cd /horovod/test && (ls -1 test_*.py | sed 's/[a-z_]*tensorflow2[a-z_.]*//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 horovodrun -np 2 -H localhost:2 --gloo /bin/bash /pytest.sh gloo)"
+- label: ':pytest: Gloo Parallel PyTests (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+  command: bash -c "cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 horovodrun -np 2 -H localhost:2 --gloo /bin/bash /pytest.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -586,8 +586,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests Standalone (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c "cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.standalone.xml test_spark.py test_run.py test_ray.py"
+- label: ':pytest: Gloo Single PyTests (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -602,8 +602,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run Cluster PyTests (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml test_static_run.py"
+- label: ':pytest: Gloo Cluster PyTests (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -618,7 +618,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow MNIST (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+- label: ':tensorflow: Gloo TensorFlow MNIST (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/tensorflow_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -634,7 +634,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test Keras MNIST (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+- label: ':tensorflow: Gloo Keras MNIST (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/keras_mnist_advanced.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -650,7 +650,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':fire: Test PyTorch MNIST (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+- label: ':fire: Gloo PyTorch MNIST (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/pytorch_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -666,7 +666,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test MXNet MNIST (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
+- label: ':muscle: Gloo MXNet MNIST (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/mxnet_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -779,7 +779,7 @@ steps:
   agents:
     queue: cpu
 - label: ':spark: PyTests Spark Estimators (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c "cd /horovod/test && pytest --forked -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.spark.integration.xml test_spark_keras.py test_spark_torch.py"
+  command: bash -c "cd /horovod/test && pytest --forked -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.spark.integration.xml integration/test_spark_keras.py integration/test_spark_torch.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -858,8 +858,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -1 test_*.py | sed 's/test_keras.py//g' | sed 's/test_tensorflow_keras.py//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
+- label: ':pytest: MPI Parallel PyTests (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -874,8 +874,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests Standalone (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.standalone.xml test_spark.py test_run.py"
+- label: ':pytest: MPI Single PyTests (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -890,8 +890,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run Cluster PyTests (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
+- label: ':pytest: MPI Cluster PyTests (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -907,7 +907,7 @@ steps:
   agents:
     queue: cpu
 - label: ':jupyter: Run PyTests test_interactiverun (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml test_interactiverun.py"
+  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml integration/test_interactiverun.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -922,7 +922,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test MXNet MNIST (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':muscle: MPI MXNet MNIST (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
   command: bash -c " OMP_NUM_THREADS=1 \$(cat /mpirun_command) python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -938,7 +938,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow 2.0 MNIST (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow 2.0 MNIST (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
   command: bash -c "\$(cat /mpirun_command) python /horovod/examples/tensorflow2_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -954,7 +954,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow 2.0 Keras MNIST (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow 2.0 Keras MNIST (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
   command: bash -c "\$(cat /mpirun_command) python /horovod/examples/tensorflow2_keras_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -1018,8 +1018,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -1 test_*.py | sed 's/test_keras.py//g' | sed 's/test_tensorflow_keras.py//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
+- label: ':pytest: MPI Parallel PyTests (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1034,8 +1034,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests Standalone (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.standalone.xml test_spark.py test_run.py"
+- label: ':pytest: MPI Single PyTests (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1050,8 +1050,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run Cluster PyTests (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
+- label: ':pytest: MPI Cluster PyTests (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1067,7 +1067,7 @@ steps:
   agents:
     queue: cpu
 - label: ':jupyter: Run PyTests test_interactiverun (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml test_interactiverun.py"
+  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml integration/test_interactiverun.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1082,7 +1082,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test MXNet MNIST (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':muscle: MPI MXNet MNIST (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c " OMP_NUM_THREADS=1 \$(cat /mpirun_command) python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -1098,7 +1098,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow 2.0 MNIST (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow 2.0 MNIST (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /mpirun_command) python /horovod/examples/tensorflow2_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -1114,7 +1114,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow 2.0 Keras MNIST (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow 2.0 Keras MNIST (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /mpirun_command) python /horovod/examples/tensorflow2_keras_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -1178,8 +1178,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && (ls -1 test_*.py | sed 's/test_keras.py//g' | sed 's/test_tensorflow_keras.py//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 horovodrun -np 2 -H localhost:2 --gloo /bin/bash /pytest.sh gloo)"
+- label: ':pytest: Gloo Parallel PyTests (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c "cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 horovodrun -np 2 -H localhost:2 --gloo /bin/bash /pytest.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1194,8 +1194,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests Standalone (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.standalone.xml test_spark.py test_run.py test_ray.py"
+- label: ':pytest: Gloo Single PyTests (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1210,8 +1210,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run Cluster PyTests (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml test_static_run.py"
+- label: ':pytest: Gloo Cluster PyTests (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1226,7 +1226,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow 2.0 MNIST (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: Gloo TensorFlow 2.0 MNIST (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/tensorflow2_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -1242,7 +1242,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow 2.0 Keras MNIST (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: Gloo TensorFlow 2.0 Keras MNIST (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/tensorflow2_keras_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -1258,7 +1258,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':fire: Test PyTorch MNIST (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':fire: Gloo PyTorch MNIST (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/pytorch_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -1274,7 +1274,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test MXNet MNIST (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':muscle: Gloo MXNet MNIST (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/mxnet_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -1386,8 +1386,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
-  command: bash -c "cd /horovod/test && (ls -1 test_*.py | sed 's/test_keras.py//g' | sed 's/test_tensorflow_keras.py//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 horovodrun -np 2 -H localhost:2 --gloo /bin/bash /pytest.sh gloo)"
+- label: ':pytest: Gloo Parallel PyTests (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
+  command: bash -c "cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 horovodrun -np 2 -H localhost:2 --gloo /bin/bash /pytest.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1402,8 +1402,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests Standalone (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
-  command: bash -c "cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.standalone.xml test_spark.py test_run.py test_ray.py"
+- label: ':pytest: Gloo Single PyTests (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
+  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1418,8 +1418,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run Cluster PyTests (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
-  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml test_static_run.py"
+- label: ':pytest: Gloo Cluster PyTests (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
+  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1434,7 +1434,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow 2.0 MNIST (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
+- label: ':tensorflow: Gloo TensorFlow 2.0 MNIST (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/tensorflow2_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -1450,7 +1450,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow 2.0 Keras MNIST (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
+- label: ':tensorflow: Gloo TensorFlow 2.0 Keras MNIST (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/tensorflow2_keras_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -1466,7 +1466,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':fire: Test PyTorch MNIST (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
+- label: ':fire: Gloo PyTorch MNIST (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/pytorch_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -1482,7 +1482,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test MXNet MNIST (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
+- label: ':muscle: Gloo MXNet MNIST (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/mxnet_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -1594,8 +1594,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -1 test_*.py | sed 's/test_keras.py//g' | sed 's/test_tensorflow_keras.py//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
+- label: ':pytest: MPI Parallel PyTests (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1610,8 +1610,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests Standalone (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.standalone.xml test_spark.py test_run.py"
+- label: ':pytest: MPI Single PyTests (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1626,8 +1626,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run Cluster PyTests (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
+- label: ':pytest: MPI Cluster PyTests (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1643,7 +1643,7 @@ steps:
   agents:
     queue: cpu
 - label: ':jupyter: Run PyTests test_interactiverun (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml test_interactiverun.py"
+  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml integration/test_interactiverun.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1658,7 +1658,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test MXNet MNIST (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
+- label: ':muscle: MPI MXNet MNIST (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
   command: bash -c " OMP_NUM_THREADS=1 \$(cat /mpirun_command) python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -1674,7 +1674,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow 2.0 MNIST (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow 2.0 MNIST (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
   command: bash -c "\$(cat /mpirun_command) python /horovod/examples/tensorflow2_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -1690,7 +1690,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow 2.0 Keras MNIST (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow 2.0 Keras MNIST (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
   command: bash -c "\$(cat /mpirun_command) python /horovod/examples/tensorflow2_keras_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -1754,8 +1754,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -1 test_*.py | sed 's/[a-z_]*tensorflow2[a-z_.]*//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
+- label: ':pytest: MPI Parallel PyTests (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1770,8 +1770,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests Standalone (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.standalone.xml test_spark.py test_run.py"
+- label: ':pytest: MPI Single PyTests (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1786,8 +1786,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run Cluster PyTests (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
+- label: ':pytest: MPI Cluster PyTests (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1802,7 +1802,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow MNIST (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow MNIST (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/tensorflow_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -1818,7 +1818,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow Eager MNIST (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow Eager MNIST (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/tensorflow_mnist_eager.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -1834,7 +1834,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test Keras MNIST (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI Keras MNIST (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/keras_mnist_advanced.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -1850,7 +1850,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':fire: Test PyTorch MNIST (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':fire: MPI PyTorch MNIST (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/pytorch_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -1866,7 +1866,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test MXNet MNIST (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':muscle: MPI MXNet MNIST (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c " OMP_NUM_THREADS=1 \$(cat /mpirun_command) python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -1882,7 +1882,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test Stall (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':muscle: MPI Stall (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/test/test_stall.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -1946,8 +1946,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && cd /horovod/test && (ls -1 test_*.py | sed 's/[a-z_]*tensorflow2[a-z_.]*//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
+- label: ':pytest: MPI Parallel PyTests (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1962,8 +1962,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests Standalone (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.standalone.xml test_spark.py test_run.py"
+- label: ':pytest: MPI Single PyTests (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1978,8 +1978,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run Cluster PyTests (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
+- label: ':pytest: MPI Cluster PyTests (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1994,7 +1994,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow MNIST (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow MNIST (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/examples/tensorflow_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2010,7 +2010,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow Eager MNIST (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow Eager MNIST (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/examples/tensorflow_mnist_eager.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2026,7 +2026,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test Keras MNIST (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI Keras MNIST (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/examples/keras_mnist_advanced.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2042,7 +2042,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':fire: Test PyTorch MNIST (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':fire: MPI PyTorch MNIST (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/examples/pytorch_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2058,7 +2058,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test MXNet MNIST (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':muscle: MPI MXNet MNIST (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && OMP_NUM_THREADS=1 \$(cat /mpirun_command) python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2074,7 +2074,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test Stall (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':muscle: MPI Stall (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/test/test_stall.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2138,8 +2138,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && cd /horovod/test && (ls -1 test_*.py | sed 's/[a-z_]*tensorflow2[a-z_.]*//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
+- label: ':pytest: MPI Parallel PyTests (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2154,8 +2154,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run PyTests Standalone (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.standalone.xml test_spark.py test_run.py"
+- label: ':pytest: MPI Single PyTests (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2170,8 +2170,8 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':pytest: Run Cluster PyTests (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
+- label: ':pytest: MPI Cluster PyTests (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2186,7 +2186,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow MNIST (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow MNIST (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/examples/tensorflow_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2202,7 +2202,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test TensorFlow Eager MNIST (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow Eager MNIST (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/examples/tensorflow_mnist_eager.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2218,7 +2218,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':tensorflow: Test Keras MNIST (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI Keras MNIST (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/examples/keras_mnist_advanced.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2234,7 +2234,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':fire: Test PyTorch MNIST (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':fire: MPI PyTorch MNIST (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/examples/pytorch_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2250,7 +2250,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test MXNet MNIST (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':muscle: MPI MXNet MNIST (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && OMP_NUM_THREADS=1 \$(cat /mpirun_command) python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2266,7 +2266,7 @@ steps:
     automatic: true
   agents:
     queue: cpu
-- label: ':muscle: Test Stall (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':muscle: MPI Stall (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/test/test_stall.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2331,8 +2331,8 @@ steps:
   agents:
     queue: cpu
 - wait
-- label: ':pytest: Run PyTests (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -1 test_*.py | sed 's/[a-z_]*tensorflow2[a-z_.]*//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
+- label: ':pytest: MPI Parallel PyTests (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2347,8 +2347,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run PyTests Standalone (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.standalone.xml test_spark.py test_run.py"
+- label: ':pytest: MPI Single PyTests (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2363,8 +2363,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run Cluster PyTests (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
+- label: ':pytest: MPI Cluster PyTests (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2379,8 +2379,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run PyTests (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && (ls -1 test_*.py | sed 's/test_keras.py//g' | sed 's/test_tensorflow_keras.py//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 horovodrun -np 2 -H localhost:2 --gloo /bin/bash /pytest.sh gloo)"
+- label: ':pytest: Gloo Parallel PyTests (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c "cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 horovodrun -np 2 -H localhost:2 --gloo /bin/bash /pytest.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2395,8 +2395,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run PyTests Standalone (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.standalone.xml test_spark.py test_run.py test_ray.py"
+- label: ':pytest: Gloo Single PyTests (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2411,8 +2411,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run Cluster PyTests (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml test_static_run.py"
+- label: ':pytest: Gloo Cluster PyTests (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2427,8 +2427,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && (ls -1 test_*.py | sed 's/test_keras.py//g' | sed 's/test_tensorflow_keras.py//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 horovodrun -np 2 -H localhost:2 --gloo /bin/bash /pytest.sh gloo)"
+- label: ':pytest: Gloo Parallel PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c "cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 horovodrun -np 2 -H localhost:2 --gloo /bin/bash /pytest.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2443,8 +2443,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run PyTests Standalone (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.standalone.xml test_spark.py test_run.py test_ray.py"
+- label: ':pytest: Gloo Single PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2459,8 +2459,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run Cluster PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml test_static_run.py"
+- label: ':pytest: Gloo Cluster PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2475,8 +2475,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -1 test_*.py | sed 's/test_keras.py//g' | sed 's/test_tensorflow_keras.py//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
+- label: ':pytest: MPI Parallel PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2491,8 +2491,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run PyTests Standalone (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.standalone.xml test_spark.py test_run.py"
+- label: ':pytest: MPI Single PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2507,8 +2507,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run Cluster PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
+- label: ':pytest: MPI Cluster PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2523,8 +2523,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run PyTests (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -1 test_*.py | sed 's/test_keras.py//g' | sed 's/test_tensorflow_keras.py//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
+- label: ':pytest: MPI Parallel PyTests (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2539,8 +2539,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run PyTests Standalone (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.standalone.xml test_spark.py test_run.py"
+- label: ':pytest: MPI Single PyTests (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2555,8 +2555,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run Cluster PyTests (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
+- label: ':pytest: MPI Cluster PyTests (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2571,8 +2571,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run PyTests (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -1 test_*.py | sed 's/test_keras.py//g' | sed 's/test_tensorflow_keras.py//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
+- label: ':pytest: MPI Parallel PyTests (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2587,8 +2587,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run PyTests Standalone (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.standalone.xml test_spark.py test_run.py"
+- label: ':pytest: MPI Single PyTests (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2603,8 +2603,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run Cluster PyTests (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
+- label: ':pytest: MPI Cluster PyTests (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2619,8 +2619,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run PyTests (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -1 test_*.py | sed 's/[a-z_]*tensorflow2[a-z_.]*//g' | sed 's/test_interactiverun.py//g' | sed 's/test_spark_keras.py//g' | sed 's/test_spark_torch.py//g' | sed 's/test_spark.py//g' | sed 's/test_run.py//g' | sed 's/test_ray.py//g' | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
+- label: ':pytest: MPI Parallel PyTests (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -1 parallel/test_*.py | xargs -n 1 \$(cat /mpirun_command) /bin/bash /pytest.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2635,8 +2635,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run PyTests Standalone (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.standalone.xml test_spark.py test_run.py"
+- label: ':pytest: MPI Single PyTests (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2651,8 +2651,8 @@ steps:
     automatic: true
   agents:
     queue: 4x-gpu-g4
-- label: ':pytest: Run Cluster PyTests (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
+- label: ':pytest: MPI Cluster PyTests (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2669,7 +2669,7 @@ steps:
     queue: 4x-gpu-g4
 - wait
 - label: ':jupyter: Run PyTests test_interactiverun (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml test_interactiverun.py"
+  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml integration/test_interactiverun.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2684,7 +2684,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow MNIST (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow MNIST (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/tensorflow_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2700,7 +2700,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow Eager MNIST (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow Eager MNIST (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/tensorflow_mnist_eager.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2716,7 +2716,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test Keras MNIST (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':tensorflow: MPI Keras MNIST (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/keras_mnist_advanced.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2732,7 +2732,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':fire: Test PyTorch MNIST (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':fire: MPI PyTorch MNIST (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/pytorch_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2748,7 +2748,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':muscle: Test MXNet MNIST (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':muscle: MPI MXNet MNIST (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
   command: bash -c " OMP_NUM_THREADS=1 \$(cat /mpirun_command) python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2764,7 +2764,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':muscle: Test Stall (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':muscle: MPI Stall (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/test/test_stall.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2780,7 +2780,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':terminal: Test Horovodrun (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':terminal: MPI Horovodrun (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 python /horovod/examples/tensorflow_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -2796,7 +2796,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':terminal: Test Horovodrun (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':terminal: MPI Horovodrun (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
   command: bash -c "echo 'localhost slots=2' > hostfile && horovodrun -np 2 -hostfile hostfile python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -2876,7 +2876,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow 2.0 MNIST (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':tensorflow: Gloo TensorFlow 2.0 MNIST (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/tensorflow2_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -2892,7 +2892,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow 2.0 Keras MNIST (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':tensorflow: Gloo TensorFlow 2.0 Keras MNIST (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/tensorflow2_keras_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -2908,7 +2908,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':fire: Test PyTorch MNIST (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':fire: Gloo PyTorch MNIST (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/pytorch_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -2924,7 +2924,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':muscle: Test MXNet MNIST (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':muscle: Gloo MXNet MNIST (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/mxnet_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -3004,7 +3004,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow 2.0 MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':tensorflow: Gloo TensorFlow 2.0 MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/tensorflow2_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -3020,7 +3020,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow 2.0 Keras MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':tensorflow: Gloo TensorFlow 2.0 Keras MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/tensorflow2_keras_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -3036,7 +3036,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':fire: Test PyTorch MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':fire: Gloo PyTorch MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/pytorch_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -3052,7 +3052,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':muscle: Test MXNet MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':muscle: Gloo MXNet MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 --gloo python /horovod/examples/mxnet_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -3117,7 +3117,7 @@ steps:
   agents:
     queue: 2x-gpu-g4
 - label: ':jupyter: Run PyTests test_interactiverun (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml test_interactiverun.py"
+  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml integration/test_interactiverun.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -3132,7 +3132,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':muscle: Test MXNet MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':muscle: MPI MXNet MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
   command: bash -c " OMP_NUM_THREADS=1 \$(cat /mpirun_command) python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3148,7 +3148,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow 2.0 MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow 2.0 MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
   command: bash -c "\$(cat /mpirun_command) python /horovod/examples/tensorflow2_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3164,7 +3164,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow 2.0 Keras MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow 2.0 Keras MNIST (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
   command: bash -c "\$(cat /mpirun_command) python /horovod/examples/tensorflow2_keras_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3197,7 +3197,7 @@ steps:
   agents:
     queue: 2x-gpu-g4
 - label: ':jupyter: Run PyTests test_interactiverun (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml test_interactiverun.py"
+  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml integration/test_interactiverun.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -3212,7 +3212,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':muscle: Test MXNet MNIST (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
+- label: ':muscle: MPI MXNet MNIST (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
   command: bash -c " OMP_NUM_THREADS=1 \$(cat /mpirun_command) python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3228,7 +3228,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow 2.0 MNIST (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow 2.0 MNIST (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
   command: bash -c "\$(cat /mpirun_command) python /horovod/examples/tensorflow2_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3244,7 +3244,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow 2.0 Keras MNIST (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow 2.0 Keras MNIST (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
   command: bash -c "\$(cat /mpirun_command) python /horovod/examples/tensorflow2_keras_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3277,7 +3277,7 @@ steps:
   agents:
     queue: 2x-gpu-g4
 - label: ':jupyter: Run PyTests test_interactiverun (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml test_interactiverun.py"
+  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml integration/test_interactiverun.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -3292,7 +3292,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':muscle: Test MXNet MNIST (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
+- label: ':muscle: MPI MXNet MNIST (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
   command: bash -c " OMP_NUM_THREADS=1 \$(cat /mpirun_command) python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3308,7 +3308,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow 2.0 MNIST (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow 2.0 MNIST (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
   command: bash -c "\$(cat /mpirun_command) python /horovod/examples/tensorflow2_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3324,7 +3324,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow 2.0 Keras MNIST (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow 2.0 Keras MNIST (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
   command: bash -c "\$(cat /mpirun_command) python /horovod/examples/tensorflow2_keras_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3357,7 +3357,7 @@ steps:
   agents:
     queue: 2x-gpu-g4
 - label: ':jupyter: Run PyTests test_interactiverun (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml test_interactiverun.py"
+  command: bash -c "cd /horovod/test && pytest -v --capture=no --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.integration.xml integration/test_interactiverun.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -3372,7 +3372,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow MNIST (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow MNIST (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/tensorflow_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3388,7 +3388,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test TensorFlow Eager MNIST (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI TensorFlow Eager MNIST (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/tensorflow_mnist_eager.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3404,7 +3404,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':tensorflow: Test Keras MNIST (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':tensorflow: MPI Keras MNIST (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/keras_mnist_advanced.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3420,7 +3420,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':fire: Test PyTorch MNIST (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':fire: MPI PyTorch MNIST (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/examples/pytorch_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3436,7 +3436,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':muscle: Test MXNet MNIST (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':muscle: MPI MXNet MNIST (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c " OMP_NUM_THREADS=1 \$(cat /mpirun_command) python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3452,7 +3452,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':muscle: Test Stall (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':muscle: MPI Stall (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c " \$(cat /mpirun_command) python /horovod/test/test_stall.py"
   artifact_paths: "artifacts/**"
   plugins:
@@ -3468,7 +3468,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':terminal: Test Horovodrun (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':terminal: MPI Horovodrun (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: horovodrun -np 2 -H localhost:2 python /horovod/examples/tensorflow_mnist.py
   artifact_paths: "artifacts/**"
   plugins:
@@ -3484,7 +3484,7 @@ steps:
     automatic: true
   agents:
     queue: 2x-gpu-g4
-- label: ':terminal: Test Horovodrun (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
+- label: ':terminal: MPI Horovodrun (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
   command: bash -c "echo 'localhost slots=2' > hostfile && horovodrun -np 2 -hostfile hostfile python /horovod/examples/mxnet_mnist.py"
   artifact_paths: "artifacts/**"
   plugins:
