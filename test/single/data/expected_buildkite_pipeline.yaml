@@ -267,7 +267,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Single PyTests (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -283,7 +283,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Cluster PyTests (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -395,7 +395,7 @@ steps:
   agents:
     queue: cpu
 - label: ':muscle: MPI Stall (test-cpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c " \$(cat /mpirun_command) python /horovod/test/test_stall.py"
+  command: bash -c " \$(cat /mpirun_command) python /horovod/test/integration/test_stall.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -587,7 +587,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: Gloo Single PyTests (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh gloo)"
+  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -603,7 +603,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: Gloo Cluster PyTests (test-cpu-gloo-py3_6-tf1_15_0-keras2_2_4-torch1_2_0-mxnet1_4_1-pyspark2_3_2)'
-  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml integration/test_static_run.py"
+  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -875,7 +875,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Single PyTests (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -891,7 +891,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Cluster PyTests (test-cpu-openmpi-py3_6-tf2_0_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1035,7 +1035,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Single PyTests (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1051,7 +1051,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Cluster PyTests (test-cpu-openmpi-py3_6-tf2_1_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1195,7 +1195,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: Gloo Single PyTests (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh gloo)"
+  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1211,7 +1211,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: Gloo Cluster PyTests (test-cpu-gloo-py3_7-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml integration/test_static_run.py"
+  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1403,7 +1403,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: Gloo Single PyTests (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
-  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh gloo)"
+  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1419,7 +1419,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: Gloo Cluster PyTests (test-cpu-gloo-py3_8-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_5_0-pyspark3_0_0)'
-  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml integration/test_static_run.py"
+  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1611,7 +1611,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Single PyTests (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1627,7 +1627,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Cluster PyTests (test-cpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1771,7 +1771,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Single PyTests (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1787,7 +1787,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Cluster PyTests (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1883,7 +1883,7 @@ steps:
   agents:
     queue: cpu
 - label: ':muscle: MPI Stall (test-cpu-mpich-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " \$(cat /mpirun_command) python /horovod/test/test_stall.py"
+  command: bash -c " \$(cat /mpirun_command) python /horovod/test/integration/test_stall.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1963,7 +1963,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Single PyTests (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
+  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -1979,7 +1979,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Cluster PyTests (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
+  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2075,7 +2075,7 @@ steps:
   agents:
     queue: cpu
 - label: ':muscle: MPI Stall (test-cpu-oneccl-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/test/test_stall.py"
+  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_mpi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/test/integration/test_stall.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2155,7 +2155,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Single PyTests (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
+  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2171,7 +2171,7 @@ steps:
   agents:
     queue: cpu
 - label: ':pytest: MPI Cluster PyTests (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
+  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2267,7 +2267,7 @@ steps:
   agents:
     queue: cpu
 - label: ':muscle: MPI Stall (test-cpu-oneccl-ofi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/test/test_stall.py"
+  command: bash -c "\$(cat /oneccl_env) && echo '/mpirun_command_ofi' > /mpirun_command && \$(cat /mpirun_command) python /horovod/test/integration/test_stall.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2348,7 +2348,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: MPI Single PyTests (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2364,7 +2364,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: MPI Cluster PyTests (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2396,7 +2396,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: Gloo Single PyTests (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh gloo)"
+  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2412,7 +2412,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: Gloo Cluster PyTests (test-gpu-gloo-py3_6-tf2_0_0-keras2_3_1-torch1_4_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml integration/test_static_run.py"
+  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2444,7 +2444,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: Gloo Single PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh gloo)"
+  command: bash -c "cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh gloo)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2460,7 +2460,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: Gloo Cluster PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml integration/test_static_run.py"
+  command: bash -c "/etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.gloo.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2492,7 +2492,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: MPI Single PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2508,7 +2508,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: MPI Cluster PyTests (test-gpu-openmpi-gloo-py3_6-tf2_2_0-keras2_3_1-torch1_5_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2540,7 +2540,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: MPI Single PyTests (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2556,7 +2556,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: MPI Cluster PyTests (test-gpu-openmpi-py3_6-tf2_3_0-keras2_3_1-torch1_6_0-mxnet1_6_0-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2588,7 +2588,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: MPI Single PyTests (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2604,7 +2604,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: MPI Cluster PyTests (test-gpu-openmpi-py3_6-tfhead-kerashead-torchhead-mxnethead-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2636,7 +2636,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: MPI Single PyTests (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /pytest_standalone.sh mpi)"
+  command: bash -c " cd /horovod/test && (ls -l single/test_*.py | xargs -n 1 /bin/bash /pytest_standalone.sh mpi)"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2652,7 +2652,7 @@ steps:
   agents:
     queue: 4x-gpu-g4
 - label: ':pytest: MPI Cluster PyTests (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml integration/test_static_run.py"
+  command: bash -c " /etc/init.d/ssh start && cd /horovod/test/integration && pytest --forked -v --capture=fd --continue-on-collection-errors --junit-xml=/artifacts/junit.mpi.static.xml test_static_run.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -2765,7 +2765,7 @@ steps:
   agents:
     queue: 2x-gpu-g4
 - label: ':muscle: MPI Stall (test-gpu-openmpi-py3_6-tf1_15_0-keras2_2_4-torch1_3_0-mxnet1_4_1-pyspark2_4_0)'
-  command: bash -c " \$(cat /mpirun_command) python /horovod/test/test_stall.py"
+  command: bash -c " \$(cat /mpirun_command) python /horovod/test/integration/test_stall.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
@@ -3453,7 +3453,7 @@ steps:
   agents:
     queue: 2x-gpu-g4
 - label: ':muscle: MPI Stall (test-mixed-openmpi-py3_6-tf1_15_0-keras2_3_1-torch1_4_0-mxnet1_5_0-pyspark2_4_0)'
-  command: bash -c " \$(cat /mpirun_command) python /horovod/test/test_stall.py"
+  command: bash -c " \$(cat /mpirun_command) python /horovod/test/integration/test_stall.py"
   artifact_paths: "artifacts/**"
   plugins:
   - docker-compose#v3.5.0:
