@@ -104,7 +104,6 @@ class BuildKiteTests(unittest.TestCase):
                              "  agents:\n"
                              "    queue: cpu\n"
                              "- wait\n"
-                             "- wait\n"
                              "- wait\n", actual_pipeline)
             self.assertEqual('', gen_pipeline_log)
 
