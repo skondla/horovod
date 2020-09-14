@@ -30,7 +30,7 @@ jobs:
 
     - name: Unit Test Results
       if: github.repository_owner == 'horovod'
-      uses: EnricoMi/publish-unit-test-result-action@master
+      uses: EnricoMi/publish-unit-test-result-action@branch-publish-annotations
       with:
         check_name: Unit Test Results
         github_token: ${{ secrets.GITHUB_TOKEN }}
